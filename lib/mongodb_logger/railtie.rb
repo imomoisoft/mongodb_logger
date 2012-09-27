@@ -3,7 +3,7 @@ module MongodbLogger
   class Railtie < Rails::Railtie
     include MongodbLogger::InitializerMixin
     
-    initializer :initialize_mongodb_logger, :before => :initialize_logger do
+    initializer :initialize_mongodb_logger, :after => :'mongo_mapper.initialize_database' do
       app_config = Rails.application.config
       Rails.logger = config.logger = create_logger(app_config)
     end
