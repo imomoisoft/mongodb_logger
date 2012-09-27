@@ -49,14 +49,14 @@ module MongodbLogger
         message = block_given? ? yield : orig_message
         $stdout.puts(message)
       end
-      if @level && @level <= severity && (message.present? || block_given?) && @mongo_record.present?
+      if @level && @level <= severity && (orig_message.present? || block_given?) && @mongo_record.present?
         # do not modify the original message used by the buffered logger
         message = block_given? ? yield : orig_message
         msg = logging_colorized? ? message.to_s.gsub(/(\e(\[([\d;]*[mz]?))?)?/, '').strip : message
         @mongo_record[:messages][LOG_LEVEL_SYM[severity]] << msg
       end
       # may modify the original message
-      disable_file_logging? ? message : (@level ? super : message)
+      disable_file_logging? ? orig_message : (@level ? super : orig_message)
     end
 
     # Drop the capped_collection and recreate it
