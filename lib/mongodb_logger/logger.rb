@@ -44,10 +44,14 @@ module MongodbLogger
       end if @mongo_record
     end
 
-    def add(severity, message = nil, progname = nil, &block)
-      $stdout.puts(message) if ENV['HEROKU_RACK'] # log in stdout on Heroku
-      if @level && @level <= severity && message.present? && @mongo_record.present?
+    def add(severity, orig_message = nil, progname = nil, &block)
+      if ENV['HEROKU_RACK'] # log in stdout on Heroku
+        message = block_given? ? yield : orig_message
+        $stdout.puts(message)
+      end
+      if @level && @level <= severity && (message.present? || block_given?) && @mongo_record.present?
         # do not modify the original message used by the buffered logger
+        message = block_given? ? yield : orig_message
         msg = logging_colorized? ? message.to_s.gsub(/(\e(\[([\d;]*[mz]?))?)?/, '').strip : message
         @mongo_record[:messages][LOG_LEVEL_SYM[severity]] << msg
       end
@@ -151,35 +155,14 @@ module MongodbLogger
       end
 
       def mongo_connection_object
-        if @db_configuration['hosts']
-          conn = Mongo::ReplSetConnection.new(*(@db_configuration['hosts'] <<
-            {:connect => true, :pool_timeout => 6}))
-          @db_configuration['replica_set'] = true
-        elsif @db_configuration['url']
-          conn = Mongo::Connection.from_uri(@db_configuration['url'])
-        else
-          conn = Mongo::Connection.new(@db_configuration['host'],
-                                       @db_configuration['port'],
-                                       :connect => true,
-                                       :pool_timeout => 6)
-        end
+        conn = MongoMapper.connection
         @mongo_connection_type = conn.class
         conn
       end
 
       def connect
-        if @db_configuration['url']
-          uri = URI.parse(@db_configuration['url'])
-          @mongo_connection ||= mongo_connection_object.db(uri.path.gsub(/^\//, ''))
-          @authenticated = true
-        else
-          @mongo_connection ||= mongo_connection_object.db(@db_configuration['database'])
-          if @db_configuration['username'] && @db_configuration['password']
-            # the driver stores credentials in case reconnection is required
-            @authenticated = @mongo_connection.authenticate(@db_configuration['username'],
-                                                          @db_configuration['password'])
-          end
-        end
+        @mongo_connection ||= MongoMapper.database
+        @authenticated = true
       end
 
       def create_collection
