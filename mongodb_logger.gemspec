@@ -19,7 +19,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "capybara",        ">= 1.1.2"
   gem.add_development_dependency "uglifier",        ">= 1.2.0"
   gem.add_development_dependency "therubyracer",    ">= 0.9.9"
-  
+
   gem.add_runtime_dependency "rake",            ">= 0.9.0"
   gem.add_runtime_dependency "mongo",           ">= 1.6.1"
   gem.add_runtime_dependency "bson_ext",        ">= 1.6.1"
@@ -35,9 +35,9 @@ Gem::Specification.new do |gem|
 
   gem.rubyforge_project = "mongodb_logger"
 
-  gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
-  gem.files         = `git ls-files`.split("\n")
-  gem.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
+  gem.executables   = []
+  gem.files         = []
+  gem.test_files    = []
   gem.name          = "mongodb_logger"
   gem.require_paths = ["lib"]
   gem.version       = MongodbLogger::VERSION

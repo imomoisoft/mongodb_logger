@@ -4,7 +4,3 @@ source 'http://rubygems.org'
 platforms :ruby do
   gemspec(:name => "mongodb_logger")
 end
-
-platforms :jruby do
-  gemspec(:name => "mongodb_logger.java")
-end
