@@ -71,7 +71,8 @@ module MongodbLogger
       @mongo_record = options.merge({
         :messages => Hash.new { |hash, key| hash[key] = Array.new },
         :request_time => Time.now.getutc,
-        :application_name => @application_name
+        :application_name => @application_name,
+        :event_hash => Digest::SHA512.hexdigest("#{@application_name}#{options[:path]}#{Time.now.getutc}")
       })
 
       runtime = Benchmark.measure{ yield }.real if block_given?
