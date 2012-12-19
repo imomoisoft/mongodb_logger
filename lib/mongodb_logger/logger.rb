@@ -178,7 +178,7 @@ module MongodbLogger
       end
 
       def insert_log_record(safe = false)
-        @mongo_collection.insert(@mongo_record, :safe => safe)
+        @mongo_collection.insert(@mongo_record, :safe => false)
       end
 
       def logging_colorized?
